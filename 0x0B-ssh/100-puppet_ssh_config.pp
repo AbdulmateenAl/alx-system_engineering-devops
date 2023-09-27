@@ -8,4 +8,5 @@ file { 'etc/ssh/ssh.config':
 	host*
 	IdentityFile ~/.ssh/school
 	PasswordAuthentication no
+	",
 }
