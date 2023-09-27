@@ -1,8 +1,22 @@
-# install nginx
-exec {'/usr/bin/env apt-get -y update': }
-exec {'/usr/bin/env apt-get -y install nginx': }
-exec {'/usr/bin/env echo "Holberton School" > /var/www/html/index.nginx-debian.html': }
-exec {'/usr/bin/env sed -i "/server_name _;/ a\\\trewrite ^/redirect_me http://www.holbertonschool.com permanent;" /etc/nginx/sites-available/default': }
-exec {'/usr/bin/env sed -i "/server_name _;/ a\\\terror_page 404 /custom_404.html;" /etc/nginx/sites-available/default': }
-exec {'/usr/bin/env echo "Ceci n\'est pas une page" > /var/www/html/custom_404.html': }
-exec {'/usr/bin/env service nginx start': }
+# Install nginx with puppet
+package { 'nginx':
+  ensure => 'installed',
+}
+
+
+file { '/var/www/html/index.html':
+  ensure  => 'file',
+  content => 'Hello World!',
+  mode    => '0644',
+  require => Package['nginx'],
+}
+
+exec { 'append_redirect_me':
+  command => "/usr/bin/sed -i '/^}$/i \\\n\tlocation \\/redirect_me {return 301 https:\\/\\/www.youtube.com\\/watch?v=QH2-TGUlwu4;}' /etc/nginx/sites-available/default",
+}
+
+service { 'nginx':
+  ensure  => 'running',
+  enable  => true,
+  require => Package['nginx'],
+}
